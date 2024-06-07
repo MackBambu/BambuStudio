@@ -1,4 +1,4 @@
-set(_wx_git_tag v3.1.5.1)
+set(_wx_git_tag bambu)
 
 set(_wx_toolkit "")
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
