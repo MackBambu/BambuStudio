@@ -27,7 +27,6 @@ endif ()
 bambustudio_add_cmake_project(wxWidgets
     GIT_REPOSITORY "https://github.com/MackBambu/wxWidgets"
     GIT_TAG ${_wx_git_tag}
-    PATCH_COMMAND ${_patch_cmd}
     DEPENDS ${PNG_PKG} ${ZLIB_PKG} ${EXPAT_PKG} dep_TIFF dep_JPEG
     CMAKE_ARGS
         -DwxBUILD_PRECOMP=ON
