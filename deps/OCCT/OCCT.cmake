@@ -27,4 +27,6 @@ bambustudio_add_cmake_project(OCCT
         -DBUILD_MODULE_Visualization=OFF
 )
 
-add_dependencies(dep_OCCT dep_FREETYPE)
+if (DEP_BUILD_FREETYPE)
+    add_dependencies(dep_OCCT ${FREETYPE_PKG})
+endif ()
