@@ -238,8 +238,7 @@ endif()
 set(OpenVDB_LIB_COMPONENTS "")
 set(OpenVDB_DEBUG_SUFFIX "d" CACHE STRING "Suffix for the debug libraries")
 
-# get_property(_is_multi GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-set(_is_multi FALSE)
+get_property(_is_multi GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 foreach(COMPONENT ${OpenVDB_FIND_COMPONENTS})
   set(LIB_NAME ${COMPONENT})
@@ -258,9 +257,10 @@ foreach(COMPONENT ${OpenVDB_FIND_COMPONENTS})
     list(APPEND OpenVDB_LIB_COMPONENTS ${OpenVDB_${COMPONENT}_LIBRARY_RELEASE})
     if (OpenVDB_${COMPONENT}_LIBRARY_DEBUG)
       list(APPEND OpenVDB_LIB_COMPONENTS ${OpenVDB_${COMPONENT}_LIBRARY_DEBUG})
+      list(FIND CMAKE_CONFIGURATION_TYPES "Debug" _has_debug)
+    else()
+      set(_has_debug -1)
     endif ()
-
-    list(FIND CMAKE_CONFIGURATION_TYPES "Debug" _has_debug)
     
     if(OpenVDB_${COMPONENT}_LIBRARY_RELEASE AND (NOT MSVC OR _has_debug LESS 0 OR OpenVDB_${COMPONENT}_LIBRARY_DEBUG))
       set(OpenVDB_${COMPONENT}_FOUND TRUE)

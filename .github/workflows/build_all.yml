@@ -15,7 +15,7 @@ on:
 
   pull_request:
     branches:
-     - master
+     - main
     paths:
      - 'deps/**'
      - 'src/**'
@@ -23,6 +23,8 @@ on:
      - 'version.inc'
      - ".github/workflows/build_*.yml"
      - 'BuildLinux.sh'
+     - 'linux.d/**'
+     - 'cmake/**'
      - 'build_win.bat'
     
   workflow_dispatch: # manual dispatch
