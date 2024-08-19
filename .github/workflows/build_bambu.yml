@@ -75,7 +75,7 @@ jobs:
 
   #   Mac
       - name: Build slicer mac
-        if: contains(inputs.os, 'macos-13')
+        if: contains(inputs.os, 'macos-14')
         working-directory: ${{ github.workspace }}
         run: |
           brew install automake texinfo
@@ -86,7 +86,7 @@ jobs:
 
   # Thanks to RaySajuuk, it's working now
       # - name: Sign app and notary
-      #   if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && inputs.os == 'macos-13'
+      #   if: (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && inputs.os == 'macos-14'
       #   working-directory: ${{ github.workspace }}
       #   env:
       #     BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
@@ -112,7 +112,7 @@ jobs:
       #     xcrun stapler staple OrcaSlicer_Mac_${{inputs.arch}}_${{ env.ver }}.dmg
 
       # - name: Create DMG without notary
-      #   if: github.ref != 'refs/heads/main' && inputs.os == 'macos-13'
+      #   if: github.ref != 'refs/heads/main' && inputs.os == 'macos-14'
       #   working-directory: ${{ github.workspace }}
       #   run: |
       #     ls ${{ github.workspace }}/install_dir
@@ -120,19 +120,19 @@ jobs:
       #     create-dmg --volname "Bambu Studio" --window-pos 200 120 --window-size 600 400 --icon-size 100 --icon "BambuStudio.app" 200 150 --app-drop-link 400 150 BambuStudio_Mac_${{inputs.arch}}_${{ env.ver }}.dmg ${{ github.workspace }}/install_dir/
 
       - name: pack mac app
-        if: github.ref != 'refs/heads/main' && contains(inputs.os, 'macos-13')
+        if: github.ref != 'refs/heads/main' && contains(inputs.os, 'macos-14')
         working-directory: ${{ github.workspace }}
         run: zip -r BambuStudio_Mac_${{inputs.arch}}_${{ env.ver }}.zip ${{ github.workspace }}/install_dir
 
       - name: Upload artifacts mac
-        if: contains(inputs.os, 'macos-13')
+        if: contains(inputs.os, 'macos-14')
         uses: actions/upload-artifact@v4
         with:
           name: BambuStudio_Mac_${{inputs.arch}}_${{ env.ver }}
           path: ${{ github.workspace }}/BambuStudio_Mac_${{inputs.arch}}_${{ env.ver }}.zip
 
       # - name: Deploy Mac release
-      #   if: github.ref == 'refs/heads/main' && contains(inputs.os, 'macos-13')
+      #   if: github.ref == 'refs/heads/main' && contains(inputs.os, 'macos-14')
       #   uses: WebFreak001/deploy-nightly@v3.1.0
       #   with:
       #     upload_url: https://uploads.github.com/repos/SoftFever/OrcaSlicer/releases/137995723/assets{?name,label}
