@@ -85,7 +85,7 @@ jobs:
             mkdir -p ${{ github.workspace }}/deps/build_${{ inputs.arch }}
             mkdir -p ${{ github.workspace }}/deps/build_${{ inputs.arch }}/BambuStudio_dep_${{ inputs.arch }}
             cd ${{ github.workspace }}/deps/build_${{ inputs.arch }}
-            cmake ../ -DDESTDIR="${{ github.workspace }}/deps/build_${{ inputs.arch }}/BambuStudio_dep_${{ inputs.arch }}" -DOPENSSL_ARCH="darwin64-x86_64-cc"
+            cmake ../ -DDESTDIR="${{ github.workspace }}/deps/build_${{ inputs.arch }}/BambuStudio_dep_${{ inputs.arch }}" -DOPENSSL_ARCH="darwin64-${{ inputs.arch }}-cc" -DCMAKE_BUILD_TYPE="Release" -DCMAKE_OSX_DEPLOYMENT_TARGET="10.15"
             make -j4
             brew install zstd
 
