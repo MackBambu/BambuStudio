@@ -1,5 +1,6 @@
 #ifndef slic3r_Format_STEP_hpp_
 #define slic3r_Format_STEP_hpp_
+#include "XCAFDoc_DocumentTool.hxx"
 
 namespace Slic3r {
 
