@@ -7,8 +7,11 @@
 #include "libslic3r_version.h"
 #include "../Utils/Http.hpp"
 
+#include <regex>
+
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/chrono.hpp>
 
 #include <wx/sizer.h>
 #include <wx/toolbar.h>
@@ -512,6 +515,16 @@ void WebViewPanel::SendRecentList(int images)
 
 void WebViewPanel::SendDesignStaffpick(bool on)
 {
+    static long long StaffPickMs = 0;
+
+    auto      now       = std::chrono::system_clock::now();
+    long long TmpMs     = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+    long long nInterval = TmpMs - StaffPickMs;
+    if (nInterval < 500) return;
+    StaffPickMs = TmpMs;
+
+    BOOST_LOG_TRIVIAL(info) << "Begin SendDesignStaffpick: " << nInterval;
+
     try {
         if (on) {
             std::string sguide = wxGetApp().app_config->get("firstguide", "finish");
@@ -814,7 +827,29 @@ void WebViewPanel::SetMakerworldPageLoginStatus(bool login ,wxString ticket)
         mw_currenturl.Replace("modelid=", "");
     }
 
-    //mw_currenturl.Replace("modelid=", "");
+    //If AgreeTerms, Redirect Other Url
+    std::regex pattern("^https://.*/(.*/){0,1}agree-terms.*");
+    if (std::regex_match(mw_currenturl.ToStdString(), pattern)) {
+        std::regex  ParamPattern("agreeBackUrl=([^&]+)");
+        std::smatch match;
+        std::string CurUrl = mw_currenturl.ToStdString();
+        if (std::regex_search(CurUrl, match, ParamPattern)) 
+        {
+            //std::cout << "Param Value: " << match[1] << std::endl;
+            mw_currenturl = wxGetApp().url_decode(std::string(match[1]));
+        } else {
+            //std::cout << "Not Find agreeBackUrl" << std::endl;
+            auto host = wxGetApp().get_model_http_url(wxGetApp().app_config->get_country_code());
+
+            wxString language_code = wxGetApp().current_language_code().BeforeFirst('_');
+            language_code          = language_code.ToStdString();
+
+            mw_currenturl = (boost::format("%1%%2%/studio/webview?from=bambustudio") % host % language_code.mb_str()).str();
+        }
+    } else {
+        //std::cout << "The string does not match the pattern." << std::endl;
+    }
+
     wxString mw_jumpurl = "";
 
     bool b = GetJumpUrl(login, ticket, mw_currenturl, mw_jumpurl);
@@ -986,10 +1021,11 @@ void WebViewPanel::OnNewWindow(wxWebViewEvent& evt)
     if (wxGetApp().get_mode() == comDevelop)
         wxLogMessage("%s", "New window; url='" + evt.GetURL() + "'" + flag);
 
-    //If we handle new window events then just load them in this window as we
-    //are a single window browser
-    if (m_tools_handle_new_window->IsChecked())
-        m_browser->LoadURL(evt.GetURL());
+    //If we handle new window events then just load them in local browser
+    if (m_tools_handle_new_window->IsChecked()) 
+    {
+        wxLaunchDefaultBrowser(evt.GetURL());
+    }
 
     UpdateState();
 }
@@ -1375,6 +1411,8 @@ void WebViewPanel::SwitchWebContent(std::string modelname, int refresh)
         CallAfter([this]{
             SetWebviewShow("online", false);
             SetWebviewShow("right", true);
+
+            GetSizer()->Layout();
         });
     }
 }
@@ -1396,7 +1434,7 @@ void WebViewPanel::SwitchLeftMenu(std::string strMenu)
 
 void WebViewPanel::OpenOneMakerlab(std::string url) {
     auto        host = wxGetApp().get_model_http_url(wxGetApp().app_config->get_country_code());
-    std::string LabUrl  = (boost::format("%1%%2%") % host % url).str();
+    std::string LabUrl  = (boost::format("%1%%2%?from=bambustudio") % host % url).str();
 
     wxString      FinalUrl = LabUrl;
     NetworkAgent *agent    = GUI::wxGetApp().getAgent();
