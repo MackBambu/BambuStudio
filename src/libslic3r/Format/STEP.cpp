@@ -196,11 +196,7 @@ static void getNamedSolids(const TopLoc_Location& location, const std::string& p
             namedSolids.emplace_back(TopoDS::Compound(transform.Shape()), fullName);
             break;
         case TopAbs_COMPSOLID:
-            for (explorer.Init(transform.Shape(), TopAbs_SOLID); explorer.More(); explorer.Next()) {
-                i++;
-                const TopoDS_Shape& currentShape = explorer.Current();
-                namedSolids.emplace_back(TopoDS::Solid(currentShape), fullName + "-SOLID-" + std::to_string(i));
-            }
+            namedSolids.emplace_back(TopoDS::CompSolid(transform.Shape()), fullName);
             break;
         case TopAbs_SOLID:
             namedSolids.emplace_back(TopoDS::Solid(transform.Shape()), fullName);
