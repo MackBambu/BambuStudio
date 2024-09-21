@@ -139,7 +139,6 @@
 #include "PlateSettingsDialog.hpp"
 #include "DailyTips.hpp"
 #include "CreatePresetsDialog.hpp"
-#include "FilamentMapDialog.hpp"
 #include "StepMeshDialog.hpp"
 
 using boost::optional;
