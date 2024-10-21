@@ -42,6 +42,8 @@ set(SLIC3R_GTK "2" CACHE STRING "GTK version to use with wxWidgets on Linux")
 
 set(IS_CROSS_COMPILE FALSE)
 
+set(FLATPAK FALSE CACHE BOOL "Not copy FFMPEG file")
+
 
 if (APPLE)
     set(CMAKE_FIND_FRAMEWORK LAST)
