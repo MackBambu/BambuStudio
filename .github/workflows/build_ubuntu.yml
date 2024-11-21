@@ -1,6 +1,36 @@
 name: Build Linux
 
-on: [pull_request]
+on:
+  push:
+    branches:
+     - main
+    paths:
+     - 'deps/**'
+     - 'src/**'
+     - '**/CMakeLists.txt'
+     - 'version.inc'
+     - 'bbl/**'
+     - 'resources/**'
+     - ".github/workflows/build_*.yml"
+
+  pull_request:
+    branches:
+     - master
+    paths:
+     - 'deps/**'
+     - 'src/**'
+     - '**/CMakeLists.txt'
+     - 'version.inc'
+     - ".github/workflows/build_*.yml"
+     - 'BuildLinux.sh'
+     - 'build_win.bat'
+    
+  workflow_dispatch: # manual dispatch
+      inputs:
+        build-deps-only:
+            description: 'Only build dependencies (bypasses caching)'
+            type: boolean
+            default: false
 
 jobs:
   appimage-builder:
