@@ -5848,12 +5848,13 @@ bool GUI_App::load_language(wxString language, bool initial)
                                     % original_lang % language_info->CanonicalName.ToUTF8().data();
     }
 #endif
-
+#ifndef __linux__
     if (! wxLocale::IsAvailable(language_info->Language)&&initial) {
         language_info = wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH_UK);
         app_config->set("language", language_info->CanonicalName.ToUTF8().data());
     }
-    else if (initial) {
+#endif
+    // else if (initial) {
         // bbs supported languages
         //TODO: use a global one with Preference
         //wxLanguage supported_languages[]{
@@ -5885,8 +5886,8 @@ bool GUI_App::load_language(wxString language, bool initial)
         //    if (!embedded_language)
         //        app_config->erase("app", "language");
         //}
-    }
-
+    // }
+#ifndef __linux__
     if (! wxLocale::IsAvailable(language_info->Language)) {
     	// Loading the language dictionary failed.
     	wxString message = "Switching Bambu Studio to language " + language_info->CanonicalName + " failed.";
@@ -5902,7 +5903,7 @@ bool GUI_App::load_language(wxString language, bool initial)
 		else
 			return false;
     }
-
+#endif
     // Release the old locales, create new locales.
     //FIXME wxWidgets cause havoc if the current locale is deleted. We just forget it causing memory leaks for now.
     m_wxLocale.release();
