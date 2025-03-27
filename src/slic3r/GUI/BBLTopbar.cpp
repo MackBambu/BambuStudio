@@ -276,7 +276,7 @@ void BBLTopbar::Init(wxFrame* parent)
 
     //this->AddSeparator();
     this->AddSpacer(FromDIP(4));
-
+#ifndef __linux__
     wxBitmap iconize_bitmap = create_scaled_bitmap("topbar_min", nullptr, TOPBAR_ICON_SIZE);
     wxAuiToolBarItem* iconize_btn = this->AddTool(wxID_ICONIZE_FRAME, "", iconize_bitmap);
 
@@ -295,6 +295,7 @@ void BBLTopbar::Init(wxFrame* parent)
 
     wxBitmap close_bitmap = create_scaled_bitmap("topbar_close", nullptr, TOPBAR_ICON_SIZE);
     wxAuiToolBarItem* close_btn = this->AddTool(wxID_CLOSE_FRAME, "", close_bitmap);
+#endif
 
     Realize();
     // m_toolbar_h = this->GetSize().GetHeight();
@@ -302,8 +303,9 @@ void BBLTopbar::Init(wxFrame* parent)
 
     int client_w = parent->GetClientSize().GetWidth();
     this->SetSize(client_w, m_toolbar_h);
-
+#ifndef __linux__
     this->Bind(wxEVT_MOTION, &BBLTopbar::OnMouseMotion, this);
+#endif
     this->Bind(wxEVT_MOUSE_CAPTURE_LOST, &BBLTopbar::OnMouseCaptureLost, this);
     this->Bind(wxEVT_MENU_CLOSE, &BBLTopbar::OnMenuClose, this);
     this->Bind(wxEVT_AUITOOLBAR_TOOL_DROPDOWN, &BBLTopbar::OnFileToolItem, this, ID_TOP_FILE_MENU);
