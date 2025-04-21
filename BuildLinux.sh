@@ -193,15 +193,15 @@ then
     echo "done"
 fi
 
-if [[ -e ${ROOT}/build/src/BuildLinuxImage.sh ]]; then
+if [[ -e ${ROOT}/build/BuildLinuxImage_new.sh ]]; then
 # Give proper permissions to script
-chmod 755 ${ROOT}/build/src/BuildLinuxImage.sh
+chmod 755 ${ROOT}/build/BuildLinuxImage_new.sh
 
 echo "[9/9] Generating Linux app..."
     pushd build
         if [[ -n "${BUILD_IMAGE}" ]]
         then
-            ${ROOT}/build/src/BuildLinuxImage.sh -i
+            ${ROOT}/build/BuildLinuxImage_new.sh
         fi
     popd
 echo "done"

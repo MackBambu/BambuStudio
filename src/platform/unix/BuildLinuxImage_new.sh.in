@@ -1,0 +1,67 @@
+#!/bin/bash
+
+APPIMAGETOOL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+LIB4BN="https://raw.githubusercontent.com/VHSgunzo/sharun/refs/tags/v0.6.3/lib4bin"
+SHARUN="https://github.com/VHSgunzo/sharun/releases/download/v0.6.3/sharun-x86_64-upx"
+
+
+# create directory and copy into it
+if [ -d "package" ]
+then
+    rm -rf package/*
+    rm -rf package/.* 2&>/dev/null
+else
+    mkdir package
+fi
+mkdir package/bin
+
+# copy Resources
+cp -Rf ../resources package/resources
+cp -f src/@SLIC3R_APP_CMD@ package/bin/@SLIC3R_APP_CMD@
+cp -f src/*.so* package/bin/
+
+cd package
+
+cp resources/images/@SLIC3R_APP_KEY@_192px.png @SLIC3R_APP_KEY@.png
+mkdir -p usr/share/icons/hicolor/192x192/apps
+cp resources/images/@SLIC3R_APP_KEY@_192px.png usr/share/icons/hicolor/192x192/apps/@SLIC3R_APP_KEY@.png
+cat <<EOF > @SLIC3R_APP_KEY@.desktop
+[Desktop Entry]
+Name=@SLIC3R_APP_KEY@
+Exec=AppRun %F
+Icon=@SLIC3R_APP_KEY@
+Type=Application
+Categories=Utility;
+MimeType=model/stl;application/vnd.ms-3mfdocument;application/prs.wavefront-obj;application/x-amf;
+EOF
+
+rm ./lib4bin || true
+wget "$LIB4BN" -O ./lib4bin
+chmod +x ./lib4bin
+xvfb-run -a -- ./lib4bin -p -v -e -s -k \
+  bin/@SLIC3R_APP_CMD@ \
+  bin/*.so* \
+  /usr/lib/x86_64-linux-gnu/libwebkit2gtk*
+
+rm -f ./lib4bin
+
+
+# Create environment
+echo 'SHARUN_WORKING_DIR=${SHARUN_DIR}
+GSETTINGS_BACKEND=memory
+unset LD_LIBRARY_PATH
+unset LD_PRELOAD' > ./.env
+
+# Prepare sharun
+ln ./sharun ./AppRun
+./sharun -g
+
+cd ..
+rm ./appimagetool || true
+wget -q "$APPIMAGETOOL" -O ./appimagetool
+chmod +x ./appimagetool
+
+./appimagetool \
+  --comp zstd \
+  --mksquashfs-opt -Xcompression-level --mksquashfs-opt 22 \
+  -n "${PWD}/package" "${PWD}/@SLIC3R_APP_KEY@_ubu64.AppImage"
