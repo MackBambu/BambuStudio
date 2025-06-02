@@ -50,6 +50,24 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     option(DEP_WX_GTK3 "Build wxWidgets against GTK3" OFF)
 endif()
 
+set(IS_CROSS_COMPILE FALSE)
+
+if (APPLE)
+    set(CMAKE_FIND_FRAMEWORK LAST)
+    set(CMAKE_FIND_APPBUNDLE LAST)
+    list(FIND CMAKE_OSX_ARCHITECTURES ${CMAKE_SYSTEM_PROCESSOR} _arch_idx)
+    message(STATUS "bambustudio_add_cmake_project for Apple")
+    if (CMAKE_OSX_ARCHITECTURES AND _arch_idx LESS 0)
+        message(STATUS "bambustudio_add_cmake_project for Apple crosscompiling")
+        set(IS_CROSS_COMPILE TRUE)
+        set(CMAKE_CXX_COMPILER_ID "Clang")
+        string(REPLACE ";" "$<SEMICOLON>" CMAKE_OSX_ARCHS "${CMAKE_OSX_ARCHITECTURES}")
+        set(_cmake_osx_arch -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHS})
+        set(_cmake_args_osx_arch CMAKE_ARGS -DCMAKE_OSX_ARCHITECTURES:STRING=${CMAKE_OSX_ARCHS})
+        message(STATUS "Detect Cross-compilation. Will build for target ${CMAKE_OSX_ARCHS}" )
+    endif ()
+endif ()
+
 # On developer machines, it can be enabled to speed up compilation and suppress warnings coming from IGL. 
 # FIXME:
 # Enabling this option is not safe. IGL will compile itself with its own version of Eigen while
@@ -81,7 +99,11 @@ function(bambustudio_add_cmake_project projectname)
     endif ()
 
     set(_gen "")
-    set(_build_j "-j${NPROC}")
+    if (CMAKE_BUILD_PARALLEL_LEVEL)
+        set(_build_j "-j${CMAKE_BUILD_PARALLEL_LEVEL}")
+    else()
+        set(_build_j "-j${NPROC}")
+    endif ()
     if (MSVC)
         set(_gen CMAKE_GENERATOR "${DEP_MSVC_GEN}" CMAKE_GENERATOR_PLATFORM "${DEP_PLATFORM}")
         set(_build_j "/m")
@@ -102,6 +124,7 @@ function(bambustudio_add_cmake_project projectname)
             -DCMAKE_CXX_COMPILER:STRING=${CMAKE_CXX_COMPILER}
             -DCMAKE_TOOLCHAIN_FILE:STRING=${CMAKE_TOOLCHAIN_FILE}
             -DBUILD_SHARED_LIBS:BOOL=OFF
+            ${_cmake_osx_arch}
             "${_configs_line}"
             ${DEP_CMAKE_OPTS}
             ${P_ARGS_CMAKE_ARGS}
@@ -234,6 +257,18 @@ set(FFMPEG_PKG "")
 if (DEP_BUILD_FFMPEG)
     include(FFMPEG/FFMPEG.cmake)
     set(FFMPEG_PKG dep_FFMPEG)
+endif ()
+
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} rev-parse --is-inside-work-tree
+    RESULT_VARIABLE REV_PARSE_RESULT
+    OUTPUT_VARIABLE REV_PARSE_OUTPUT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if((REV_PARSE_RESULT EQUAL 0) AND (REV_PARSE_OUTPUT STREQUAL "true"))
+    set(IN_GIT_REPO TRUE)
+    # Find relative path from root to source used for adjusting patch command
+    file(RELATIVE_PATH BINARY_DIR_REL  ${CMAKE_SOURCE_DIR}/.. ${CMAKE_BINARY_DIR})
 endif ()
 
 set(_dep_list

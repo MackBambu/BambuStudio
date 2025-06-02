@@ -10,6 +10,7 @@
 
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem/path.hpp>
 #include <openssl/md5.h>
 
 #include "libslic3r.h"
@@ -692,6 +693,9 @@ inline std::string filter_characters(const std::string& str, const std::string& 
 
     return filteredStr;
 }
+
+void save_string_file(const boost::filesystem::path& p, const std::string& str);
+void load_string_file(const boost::filesystem::path& p, std::string& str);
 
 } // namespace Slic3r
 
