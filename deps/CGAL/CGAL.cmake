@@ -1,4 +1,4 @@
-if (IN_GIT_REPO)
+if (BINARY_DIR_REL)
     set(CGAL_DIRECTORY_FLAG --directory ${BINARY_DIR_REL}/dep_CGAL-prefix/src/dep_CGAL)
 endif ()
 

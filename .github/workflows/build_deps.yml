@@ -112,7 +112,7 @@ jobs:
       - name: pack deps on Macos
         if: inputs.os == 'macos-13' || inputs.os == 'macos-15'
         working-directory: ${{ github.workspace }}
-        run: tar -zcvf "BambuStudio_dep_mac_${{ inputs.arch }}_$(date +"%Y%m%d").tar.gz" "${{ github.workspace }}/deps/build_${{ inputs.arch }}/BambuStudio_dep_${{ inputs.arch }}"
+        run: tar -zcvf "BambuStudio_dep_mac_${{ inputs.arch }}_$(date +"%Y%m%d").tar.gz" "${{ github.workspace }}/deps/build"
 
 
       - name: Build on Ubuntu

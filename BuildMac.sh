@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-while getopts ":1:dpa:st:xbc:h" opt; do
+while getopts "1dpa:st:xbc:hy:" opt; do
   case "${opt}" in
     d )
         export BUILD_TARGET="deps"
@@ -31,6 +31,9 @@ while getopts ":1:dpa:st:xbc:h" opt; do
     c )
         export BUILD_CONFIG="$OPTARG"
         ;;
+    y )
+        export DEPS_PATH="$OPTARG"
+        ;;
     1 )
         export CMAKE_BUILD_PARALLEL_LEVEL=1
         ;;
@@ -42,6 +45,7 @@ while getopts ":1:dpa:st:xbc:h" opt; do
         echo "   -x: Use Ninja CMake generator, default is Xcode"
         echo "   -b: Build without reconfiguring CMake"
         echo "   -c: Set CMake build configuration, default is Release"
+        echo "   -y: Set the directory for compiled"
         echo "   -1: limit builds to 1 core (where possible)"
         exit 0
         ;;
@@ -78,6 +82,8 @@ fi
 if [ -z "$OSX_DEPLOYMENT_TARGET" ]; then
   export OSX_DEPLOYMENT_TARGET="10.15"
 fi
+
+export CMAKE_POLICY_VERSION_MINIMUM=3.5
 
 echo "Build params:"
 echo " - ARCH: $ARCH"
@@ -145,8 +151,20 @@ function build_slicer() {
         if [ "$ARCH" == "universal" ] || [ "$ARCH" == "$_ARCH" ]; then
 
             PROJECT_BUILD_DIR="$PROJECT_DIR/build/$_ARCH"
-            DEPS_BUILD_DIR="$DEPS_DIR/build/$_ARCH"
-            DEPS="$DEPS_BUILD_DIR/BambuStudio_deps"
+            if [ -z "$DEPS_PATH" ]; then
+                DEPS_BUILD_DIR="$DEPS_DIR/build/$_ARCH"
+                DEPS="$DEPS_BUILD_DIR/BambuStudio_deps"
+            else
+                DEPS="$DEPS_PATH"
+            fi
+
+            if [ "$BUILD_CONFIG" == "Debug" ];then
+                RELEASE_PUBLIC=0
+                INTERAL_TESTING=1
+            else
+                RELEASE_PUBLIC=1
+                INTERAL_TESTING=0
+            fi
 
             echo "Building slicer for $_ARCH..."
             (
@@ -156,8 +174,8 @@ function build_slicer() {
             if [ "1." != "$BUILD_ONLY". ]; then
                 cmake "${PROJECT_DIR}" \
                     -G "${SLICER_CMAKE_GENERATOR}" \
-                    -DBBL_RELEASE_TO_PUBLIC=1 \
-                    -DBBL_INTERNAL_TESTING=0 \
+                    -DBBL_RELEASE_TO_PUBLIC="$RELEASE_PUBLIC" \
+                    -DBBL_INTERNAL_TESTING="$INTERAL_TESTING" \
                     -DCMAKE_PREFIX_PATH="$DEPS/usr/local" \
                     -DCMAKE_INSTALL_PREFIX="$PWD/BambuStudio" \
                     -DCMAKE_BUILD_TYPE="$BUILD_CONFIG" \
