@@ -706,6 +706,9 @@ function(bambustudio_copy_sos target config postfix output_sos)
             ${CMAKE_PREFIX_PATH}/lib/libswresample.so
             ${CMAKE_PREFIX_PATH}/lib/libswresample.so.5
             ${CMAKE_PREFIX_PATH}/lib/libswresample.so.5.1.100
+            ${CMAKE_PREFIX_PATH}/lib/libOSMesa.so
+            ${CMAKE_PREFIX_PATH}/lib/libOSMesa.so.8
+            ${CMAKE_PREFIX_PATH}/lib/libOSMesa.so.8.0.0
          DESTINATION ${_out_dir})
 
     set(${output_dlls}
@@ -721,6 +724,9 @@ function(bambustudio_copy_sos target config postfix output_sos)
         ${_out_dir}/libswresample.so
         ${_out_dir}/libswresample.so.5
         ${_out_dir}/libswresample.so.5.1.100
+        ${_out_dir}/libOSMesa.so
+        ${_out_dir}/libOSMesa.so.8
+        ${_out_dir}/libOSMesa.so.8.0.0
         PARENT_SCOPE
     )
 endfunction()
@@ -789,6 +795,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND NOT FLATPAK)
     ${LIBDIR_BIN}/libswresample.so.5.1.100
     ${LIBDIR_BIN}/libswscale.so.8
     ${LIBDIR_BIN}/libswscale.so.8.1.100
+    ${LIBDIR_BIN}/libOSMesa.so.8
+    ${LIBDIR_BIN}/libOSMesa.so.8.0.0
     )
     install(FILES ${LIBRARY_FILES} DESTINATION "${CMAKE_INSTALL_PREFIX}/bin")
 endif ()

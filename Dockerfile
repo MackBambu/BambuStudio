@@ -18,6 +18,10 @@ RUN apt-get update && apt-get install  -y \
     extra-cmake-modules \
     file \
     git \
+    meson \
+    flex \
+    bison \
+    python3-packaging
     gstreamer1.0-plugins-bad \
     gstreamer1.0-libav \
     libcairo2-dev \
@@ -32,7 +36,6 @@ RUN apt-get update && apt-get install  -y \
     libgstreamer-plugins-good1.0-dev \
     libgtk-3-dev \
     libgtk-3-dev \
-    libosmesa6-dev \
     libsecret-1-dev \
     libsoup2.4-dev \
     libssl3 \

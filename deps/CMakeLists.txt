@@ -43,6 +43,9 @@ option(DEP_BUILD_GLFW "Compile GLFW" ON)
 option(DEP_BUILD_FREETYPE "Compile freetype" ON)
 option(DEP_BUILD_WXWIDGETS "Compile wxWidgets" ON)
 option(DEP_BUILD_FFMPEG "Compile ffmpeg" ON)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    option(DEP_BUILD_OSMESA "Compile osmesa in linux" ON)
+endif()
 
 set(DESTDIR "${CMAKE_CURRENT_BINARY_DIR}/destdir" CACHE PATH "Destination directory")
 set(DEP_DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE PATH "Path for downloaded source packages.")
@@ -269,6 +272,12 @@ if (DEP_BUILD_FFMPEG)
     set(FFMPEG_PKG dep_FFMPEG)
 endif ()
 
+set(OSMESA_PKG "")
+if (DEP_BUILD_OSMESA)
+    include(OSMESA/OSMESA.cmake)
+    set(OSMESA_PKG dep_OSMESA)
+endif ()
+
 set(_dep_list
     ${BOOST_PKG}
     dep_TBB
@@ -287,6 +296,7 @@ set(_dep_list
     ${EXPAT_PKG}
     ${FREETYPE_PKG}
     ${FFMPEG_PKG}
+    ${OSMESA_PKG}
     )
 
 if (MSVC)

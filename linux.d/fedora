@@ -23,7 +23,6 @@ REQUIRED_DEV_PACKAGES=(
     libtool
     m4
     mesa-libGLU-devel
-    mesa-libOSMesa-devel
     mesa-libGL-devel
     ninja-build
     openssl-devel
@@ -39,6 +38,10 @@ REQUIRED_DEV_PACKAGES=(
     yasm
     x264-devel
     bzip2-devel
+    meson
+    flex
+    bison
+    python3-packaging
 )
 
 if [[ -n "$UPDATE_LIB" ]]

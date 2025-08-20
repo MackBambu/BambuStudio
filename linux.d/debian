@@ -10,9 +10,11 @@ REQUIRED_DEV_PACKAGES=(
     gettext
     git
     wget
+    flex
+    bison
+    python3-packaging
     libgstreamerd-3-dev
     libsecret-1-dev
-    libosmesa6-dev
     libssl-dev
     eglexternalplatform-dev
     libcurl4-openssl-dev
@@ -35,16 +37,15 @@ REQUIRED_DEV_PACKAGES=(
 
 if [[ -n "$UPDATE_LIB" ]]
 then
-    # for ubuntu 22+ and 23+:
+    # for ubuntu > 23
     ubu_major_version="$(grep VERSION_ID /etc/os-release | cut -d "=" -f 2 | cut -d "." -f 1 | tr -d /\"/)"
-    if [ $ubu_major_version = "22" ] || [ $ubu_major_version = "23" ]
-    then
-        REQUIRED_DEV_PACKAGES+=(libwebkit2gtk-4.0-dev curl libfuse-dev libssl-dev libcurl4-openssl-dev m4)
-    elif [ $ubu_major_version = "24" ]
+    if [ "$ubu_major_version" -gt 23 ]
     then
         REQUIRED_DEV_PACKAGES+=(libwebkit2gtk-4.1-dev)
+        REQUIRED_DEV_PACKAGES+=(meson)
     else
-        REQUIRED_DEV_PACKAGES+=(libwebkit2gtk-4.0-dev)
+        pip3 install --upgrade meson ninja mako
+        REQUIRED_DEV_PACKAGES+=(libwebkit2gtk-4.0-dev curl libfuse-dev libssl-dev libcurl4-openssl-dev m4)
     fi
     if [[ -n "$BUILD_DEBUG" ]]
     then

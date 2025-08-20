@@ -178,6 +178,12 @@ if (WIN32)
     target_link_libraries(BambuStudio_app_gui PRIVATE boost_headeronly)
 endif ()
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(OSMESA REQUIRED IMPORTED_TARGET osmesa)
+    target_link_libraries(BambuStudio PkgConfig::OSMESA)
+endif()
+
 # Link the resources dir to where Slic3r GUI expects it
 set(output_dlls_Release "")
 set(output_dlls_Debug "")
