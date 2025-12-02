@@ -1703,6 +1703,14 @@ void WebViewPanel::OnError(wxWebViewEvent& evt)
 {
     //BOOST_LOG_TRIVIAL(info) << "HomePage OnError, Url = " << evt.GetURL() << " , Message: "<<evt.GetString();
 
+    auto sanitize_url = [](const wxString &url) -> std::string {
+        wxString sanitized = url.BeforeFirst('?');
+        sanitized = sanitized.BeforeFirst('#');
+        if (sanitized.IsEmpty())
+            sanitized = url;
+        return std::string(sanitized.ToUTF8());
+    };
+
 #define WX_ERROR_CASE(type) \
     case type: \
     category = #type; \
@@ -1723,6 +1731,17 @@ void WebViewPanel::OnError(wxWebViewEvent& evt)
 
     BOOST_LOG_TRIVIAL(trace) << __FUNCTION__ << ": [" << category << "] " << evt.GetString().ToUTF8().data();
 
+    const std::string sanitized_url = sanitize_url(evt.GetURL());
+    BOOST_LOG_TRIVIAL(debug) << __FUNCTION__ << ": nav_error category=" << category.ToStdString()
+                             << ", code=" << evt.GetInt()
+                             << ", url=" << sanitized_url
+                             << ", content=" << m_contentname;
+    if (evt.GetInt() == wxWEBVIEW_NAV_ERR_NOT_FOUND) {
+        BOOST_LOG_TRIVIAL(error) << __FUNCTION__ << ": http_404_detected url=" << sanitized_url
+                                 << ", content=" << m_contentname
+                                 << ", view_id=" << evt.GetId();
+    }
+
     if (wxGetApp().get_mode() == comDevelop)
     {
         wxLogMessage("%s", "Error; url='" + evt.GetURL() + "', error='" + category + " (" + evt.GetString() + ")'");
@@ -1738,6 +1757,10 @@ void WebViewPanel::OnError(wxWebViewEvent& evt)
         if (m_contentname == "online")
         {
             wxString errurl = evt.GetURL();
+            BOOST_LOG_TRIVIAL(warning) << __FUNCTION__
+                << ": connection_error load_disconnect target=online"
+                << ", url=" << sanitized_url
+                << ", content=" << m_contentname;
 
             wxString UrlDisconnect = MakeDisconnectUrl("online");
             m_browserMW->LoadURL(UrlDisconnect);
