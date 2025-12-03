@@ -803,26 +803,37 @@ void WebViewPanel::SendMakerlabList(  )
 {
     try {
         std::string sguide = wxGetApp().app_config->get("firstguide", "finish");
-        if (sguide != "true") return;
+        if (sguide != "true") {
+            BOOST_LOG_TRIVIAL(info) << "makerlab: skip fetch, firstguide=" << sguide;
+            return;
+        }
+
+        BOOST_LOG_TRIVIAL(info) << "makerlab: fetch homepage list start";
 
         get_makerlab_list([this](std::string body) {
             if (body.empty() || body.front() != '{') {
-                BOOST_LOG_TRIVIAL(warning) << "get_makerlab_list failed " + body;
+                BOOST_LOG_TRIVIAL(warning) << "makerlab: get_makerlab_list invalid body len=" << body.size();
                 return;
             }
             CallAfter([this, body] {
                 auto body2 = from_u8(body);
 
                 json jLab = json::parse(body2);
-                if (jLab.contains("list"))
+                if (!jLab.contains("list")) {
+                    BOOST_LOG_TRIVIAL(warning) << "makerlab: response missing list";
+                } else
                 {
                     int nSize = jLab["list"].size();
+                    BOOST_LOG_TRIVIAL(info) << "makerlab: list size=" << nSize;
                     if (nSize > 0)
                     {
                         body2.insert(1, "\"command\": \"homepage_makerlab_get\", ");
                         RunScript(wxString::Format("window.postMessage(%s)", body2));
 
                         SetLeftMenuShow("makerlab", 1);
+                    }
+                    else {
+                        BOOST_LOG_TRIVIAL(warning) << "makerlab: empty list, keep menu hidden";
                     }
                 }
             });
