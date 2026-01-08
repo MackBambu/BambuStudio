@@ -41,6 +41,11 @@ if (SLIC3R_GUI)
     endif()
 
     if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        # https://gitlab.freedesktop.org/xorg/lib/libx11/-/commit/afcdb6fb0045c6186aa83d9298f327a7ec1b2cb9
+        pkg_check_modules(LIBX11 REQUIRED x11)
+        if (LIBX11_VERSION VERSION_LESS "1.8")
+            add_compile_definitions(NEED_XINITTHREADS=1)
+        endif()
         set (wxWidgets_CONFIG_OPTIONS "--toolkit=gtk${SLIC3R_GTK}")
         if (SLIC3R_WX_STABLE)
             find_package(wxWidgets 3.0 REQUIRED COMPONENTS base core adv html gl aui net media webview)
