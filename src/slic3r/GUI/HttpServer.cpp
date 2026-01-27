@@ -545,9 +545,21 @@ std::optional<std::string> TicketLoginTask::do_request_login_info(const std::str
                 j["data"]["user"]["account"]    = profile_data.account;
                 j["data"]["user"]["avatar"]     = profile_data.avatar;
                 BOOST_LOG_TRIVIAL(info) << "third_party_login: login info ready";
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login data.refresh_token = " << token_data.refreshToken;
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login data.token = " << token_data.accessToken;
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login data.expires_in = " << token_data.expiresIn;
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login data.refresh_expires_in = " << token_data.refreshExpiresIn;
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login user.uid = " << profile_data.uidStr;
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login user.name = " << profile_data.name;
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login user.account = " << profile_data.account;
+                BOOST_LOG_TRIVIAL(info) << "third_party_login: login user.avatar = " << profile_data.avatar;
                 return std::string(j.dump());
             }
         }
+    }
+    catch(const std::exception& e) {
+        BOOST_LOG_TRIVIAL(error) << "third_party_login: do_request_login_info exception: " << e.what() ;
+        return std::nullopt;
     }
     catch (...)
     {
