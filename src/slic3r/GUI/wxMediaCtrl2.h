@@ -44,7 +44,10 @@ public:
     void SetConstrainByAspectRatio(bool constrain) { m_constrain_by_aspect_ratio = constrain; }
     bool GetConstrainByAspectRatio() const { return m_constrain_by_aspect_ratio; }
 
-    static constexpr wxMediaState MEDIASTATE_BUFFERING = (wxMediaState) 6;
+    // MEDIASTATE_BUFFERING is outside wxMediaState's valid range [0, 3]; converting
+    // it to the enum in a constant expression is a hard error on Clang / Xcode 26+,
+    // so it must not be constexpr/const - keep it as a runtime-initialized value.
+    static inline wxMediaState MEDIASTATE_BUFFERING = (wxMediaState) 6;
 
 protected:
     void DoSetSize(int x, int y, int width, int height, int sizeFlags) override;
